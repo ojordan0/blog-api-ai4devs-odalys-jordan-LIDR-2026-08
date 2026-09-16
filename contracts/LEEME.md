@@ -22,6 +22,13 @@ visible: llega un `undefined` y viaja hasta la pantalla.
    esquemas que ya no existen, campos renombrados y cambios en la lista de obligatorios.
    Devuelve código de salida 1 si hay deriva, así que puede atarse a la integración continua.
 
+3. **En cada commit**, el hook `.githooks/pre-commit` comprueba la regla *«el contrato viaja
+   en el mismo commit»*: si el commit mueve un campo de `app/services/blog_ai_service.ts` y no
+   lleva este archivo dentro, se aborta. La comprobación está en
+   `scripts/contrato_en_el_commit.mjs` y se instala con `make hooks`. Es lo que impide que esta
+   copia se quede vieja **entre** dos verificaciones: los puntos 1 y 2 solo pueden avisar
+   cuando ya diverge.
+
 ## Cómo se actualiza
 
 Cuando `blog-ai` cambia su API **a propósito**:

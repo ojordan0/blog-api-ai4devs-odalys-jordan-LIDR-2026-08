@@ -162,6 +162,40 @@ curl -s localhost:3402/contrato | jq   # lo mismo, por HTTP
 [`contracts/LEEME.md`](contracts/LEEME.md) explica cómo se valida, cómo se actualiza y qué
 caza y qué no.
 
+### La regla: el contrato viaja en el mismo commit
+
+Que el contrato esté versionado no sirve de nada si se actualiza *después*. La regla que
+lo sostiene es una sola, y se lee igual en este repositorio y en `blog-ai`:
+
+> **Todo commit que añada, renombre o borre un campo de la frontera entre servicios
+> modifica también, en ese mismo commit, el archivo de contrato versionado de esa
+> frontera. Si la frontera no tiene contrato, la regla no se le aplica.**
+
+No la vigila nadie de memoria: la vigila un **hook de git**.
+
+```
+.githooks/pre-commit                  el disparador: se ejecuta en git, antes del commit
+scripts/contrato_en_el_commit.mjs     la comprobación: sale 0 si se cumple, 1 si no
+```
+
+El hook compara los campos que declara `app/services/blog_ai_service.ts` **antes y después**
+del commit que estás creando. Si esa lista cambia y `contracts/blog-ai.openapi.json` no está
+en el índice, el commit se aborta y el mensaje dice qué campo se movió. Tocar un comentario o
+reordenar el archivo no mueve ningún campo, así que no dispara.
+
+```bash
+make hooks     # apunta git a .githooks/ (make setup ya lo hace)
+```
+
+Hace falta ese paso porque **los hooks no se clonan**: vienen versionados en el repositorio,
+pero git no los activa solo. Y `git commit --no-verify` se los salta, que es justo por lo que
+esta no es la última línea de defensa, sino la primera.
+
+> 📌 **Dónde se ejecuta, que es la pregunta que importa.** En git, en tu máquina, en el
+> momento del commit — no en la sesión de ninguna herramienta. Da igual quién escriba el
+> código: el hook corre igual. Lo que **no** cubre es el otro repositorio: cuando el commit
+> se hace en `blog-ai`, el `pre-commit` que se ejecuta es el de `blog-ai`.
+
 ## Reglas de negocio
 
 Esto es lo que el sistema **debe** cumplir, y lo fijan las pruebas:
@@ -184,6 +218,8 @@ app/transformers/      DTOs de salida, campo a campo
 app/validators/        VineJS, en la frontera de entrada
 app/models/            Lucid
 contracts/             el contrato fijado con blog-ai
+scripts/               comprobaciones sueltas, sin framework: una regla, un código de salida
+.githooks/             los hooks versionados; `make hooks` apunta git aquí
 ```
 
 **Los transformers no son ceremonia.** Son el sitio donde se cumple la regla 6: el objeto de

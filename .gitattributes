@@ -2,3 +2,6 @@
 # Sin esto, un clon en Windows lo convierte a CRLF y make deja de funcionar.
 Makefile text eol=lf
 *.sh text eol=lf
+
+# Los hooks son scripts de shell: mismo motivo que el Makefile.
+.githooks/* text eol=lf

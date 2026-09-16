@@ -10,7 +10,7 @@ SHELL := /bin/bash
 CARPETA := blog-api
 REPO := blog-api-ai4devs
 
-.PHONY: ayuda check setup up test contrato
+.PHONY: ayuda check setup up test contrato hooks
 
 ayuda:
 	@echo "make check     comprueba que la maquina esta lista"
@@ -18,6 +18,7 @@ ayuda:
 	@echo "make up        arranca la API en http://localhost:3402"
 	@echo "make test      ejecuta las pruebas"
 	@echo "make contrato  verifica el contrato contra blog-ai"
+	@echo "make hooks     instala el hook que vigila que el contrato viaje en el commit"
 
 check:
 	@if [ "$$(basename $$PWD)" != "$(CARPETA)" ]; then \
@@ -35,7 +36,7 @@ check:
 	@node -e 'var v=+process.versions.node.split(".")[0]; if(v<20){console.error("ERROR: tienes Node "+process.versions.node+" y hace falta 20 o superior.");process.exit(1)}'
 	@echo "OK  blog-api: carpeta correcta y Node $$(node -v)."
 
-setup: check
+setup: check hooks
 	npm ci
 	@if [ ! -f .env ]; then cp .env.example .env; echo "OK  .env creado a partir de .env.example."; fi
 	node ace generate:key
@@ -53,3 +54,12 @@ test:
 
 contrato:
 	node ace contrato:verificar
+
+# La regla «el contrato viaja en el mismo commit» se ejecuta en git, no en la sesion
+# de ninguna herramienta. Los hooks no se clonan, asi que hay que apuntar git a los
+# que vienen versionados en .githooks/. Es idempotente: repetirlo no hace dano.
+hooks:
+	@git config core.hooksPath .githooks
+	@echo "OK  hook instalado: .githooks/pre-commit"
+	@echo "    Vigila que un cambio de campo en la frontera con blog-ai lleve"
+	@echo "    contracts/blog-ai.openapi.json en el mismo commit."

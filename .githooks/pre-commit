@@ -1,0 +1,22 @@
+#!/bin/sh
+#
+# Disparador de la regla «el contrato viaja en el mismo commit».
+#
+# Se ejecuta antes de crear el commit, mire quien mire: tu a mano, un agente, un
+# editor. Por eso la regla vive aqui y no en las instrucciones de una herramienta:
+# esto se ejecuta en git, no en la sesion de nadie.
+#
+# La comprobacion esta en scripts/contrato_en_el_commit.mjs.
+# Se instala con `make hooks` (y `make setup` ya lo hace).
+
+set -e
+
+cd "$(git rev-parse --show-toplevel)"
+
+if ! command -v node >/dev/null 2>&1; then
+  echo "pre-commit: no encuentro 'node', que hace falta para verificar el contrato." >&2
+  echo "            Instala Node 20 o superior, o salta el hook con --no-verify." >&2
+  exit 1
+fi
+
+exec node scripts/contrato_en_el_commit.mjs
