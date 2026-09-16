@@ -3,6 +3,13 @@ import Comentario from '#models/comentario'
 import { aPostDetalle, aPostResumen } from '#transformers/post_transformer'
 import type { PostDetalleDto, PostResumenDto, VecinoDto } from '#transformers/post_transformer'
 
+/**
+ * «Corriente» se escribe entero en espanol, asi que hoy el idioma es el mismo para todos
+ * los posts. Vive aqui, en un solo sitio, y no repartido por el codigo: el dia que la
+ * tabla `posts` tenga columna propia, esta constante se cambia por `post.idioma` y ya.
+ */
+const IDIOMA_DEL_BLOG = 'es'
+
 /** Quita las tildes de un texto en JavaScript (para el patron de busqueda). */
 function sinTildes(texto: string): string {
   return texto.normalize('NFD').replace(/\p{Diacritic}/gu, '')
@@ -221,6 +228,7 @@ export default class PostService {
       resumen: post.resumen,
       cuerpo: post.cuerpo,
       estado: post.estado,
+      idioma: IDIOMA_DEL_BLOG,
       categoria: post.categoria.nombre,
       etiquetas: post.etiquetas.map((etiqueta) => etiqueta.nombre),
       publicado_en: post.publicadoEn?.toISO() ?? null,

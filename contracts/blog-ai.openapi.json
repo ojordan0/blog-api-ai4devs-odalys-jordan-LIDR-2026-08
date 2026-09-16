@@ -3,6 +3,10 @@
     "schemas": {
       "Fuente": {
         "properties": {
+          "idioma": {
+            "title": "Idioma",
+            "type": "string"
+          },
           "post_id": {
             "title": "Post Id",
             "type": "integer"
@@ -24,7 +28,8 @@
           "post_id",
           "slug",
           "titulo",
-          "puntuacion"
+          "puntuacion",
+          "idioma"
         ],
         "title": "Fuente",
         "type": "object"
@@ -157,6 +162,12 @@
             "title": "Id",
             "type": "integer"
           },
+          "idioma": {
+            "maxLength": 5,
+            "minLength": 2,
+            "title": "Idioma",
+            "type": "string"
+          },
           "publicado_en": {
             "anyOf": [
               {
@@ -187,7 +198,8 @@
           "titulo",
           "resumen",
           "cuerpo",
-          "estado"
+          "estado",
+          "idioma"
         ],
         "title": "PostEntrante",
         "type": "object"

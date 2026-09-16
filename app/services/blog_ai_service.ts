@@ -9,6 +9,7 @@ export type PostParaIndexar = {
   resumen: string
   cuerpo: string
   estado: string
+  idioma: string
   categoria?: string
   etiquetas?: string[]
   publicado_en?: string | null
@@ -23,7 +24,14 @@ export type ResultadoSemantico = {
 }
 
 export type RespuestaBuscar = { consulta: string; resultados: ResultadoSemantico[] }
-export type FuenteCitada = { post_id: number; slug: string; titulo: string; puntuacion: number }
+export type FuenteCitada = {
+  post_id: number
+  slug: string
+  titulo: string
+  puntuacion: number
+  /** Idioma del post citado. Lo informa blog-ai, que lo recibio en /indexar. */
+  idioma: string
+}
 export type RespuestaPreguntar = {
   consulta: string
   respuesta: string
